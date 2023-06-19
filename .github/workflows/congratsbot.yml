@@ -27,7 +27,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'withastro/automation'
-          ref: main
+          ref: 'main'
+          path: 'automation'
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -41,7 +42,7 @@ jobs:
           COMMIT_AUTHOR: ${{ inputs.COMMIT_AUTHOR }}
           COMMIT_MESSAGE: ${{ inputs.COMMIT_MESSAGE }}
           COMMIT_ID: ${{ inputs.COMMIT_ID }}
-        run: node .github/congratsbot.mjs
+        run: node automation/.github/congratsbot.mjs
 
       - name: Send message on Discord
         env:

@@ -20,7 +20,7 @@ on:
         type: string
 
 jobs:
-  congrats:
+  post-message:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

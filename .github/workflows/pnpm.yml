@@ -1,0 +1,36 @@
+name: pnpm
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        description: 'The package.json script name which will be called via "pnpm run <command>"'
+        required: true
+        type: string
+      node-version:
+        description: 'The selected node version to be installed'
+        default: '18'
+        required: false
+        type: string
+
+jobs:
+  pnpm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run command
+        run: pnpm run ${{ inputs.command }}

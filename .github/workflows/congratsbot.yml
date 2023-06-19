@@ -1,0 +1,50 @@
+name: Congratsbot
+
+on:
+  workflow_call:
+    inputs:
+      DISCORD_WEBHOOK:
+        required: true
+        type: string
+      GITHUB_REPO:
+        required: true
+        type: string
+      COMMIT_AUTHOR:
+        required: true
+        type: string
+      COMMIT_MESSAGE:
+        required: true
+        type: string
+      COMMIT_ID:
+        required: true
+        type: string
+
+jobs:
+  congrats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - id: message
+        name: Format Discord message
+        env:
+          GITHUB_REPO: ${{ inputs.GITHUB_REPO }}
+          COMMIT_AUTHOR: ${{ inputs.COMMIT_AUTHOR }}
+          COMMIT_MESSAGE: ${{ inputs.COMMIT_MESSAGE }}
+          COMMIT_ID: ${{ inputs.COMMIT_ID }}
+        run: node ./.github/congratsbot.mjs
+
+      - name: Send message on Discord
+        env:
+          DISCORD_WEBHOOK: ${{ inputs.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: '${{ steps.message.outputs.DISCORD_MESSAGE }}'

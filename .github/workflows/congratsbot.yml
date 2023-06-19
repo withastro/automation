@@ -2,6 +2,10 @@ name: Congratsbot
 
 on:
   workflow_call:
+    secrets:
+      DISCORD_WEBHOOK:
+        required: true
+        type: string
     inputs:
       DISCORD_WEBHOOK:
         required: true

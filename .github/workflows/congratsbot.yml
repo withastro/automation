@@ -6,9 +6,6 @@ on:
       DISCORD_WEBHOOK:
         required: true
     inputs:
-      DISCORD_WEBHOOK:
-        required: true
-        type: string
       GITHUB_REPO:
         required: true
         type: string
@@ -47,7 +44,7 @@ jobs:
 
       - name: Send message on Discord
         env:
-          DISCORD_WEBHOOK: ${{ inputs.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@0.3.2
         with:
           args: '${{ steps.message.outputs.DISCORD_MESSAGE }}'

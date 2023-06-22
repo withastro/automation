@@ -37,8 +37,6 @@ function setDiscordMessage(author, id, commitMsg, repo) {
     coAuthorThanks = '\n' + getCoAuthorsMessage(names);
   }
 
-  console.log({ commitMsg, coAuthors, coAuthorThanks });
-
   const defaultEmoji = ['🎉', '🎊', '🧑‍🚀', '🥳', '🙌', '🚀', '🤩', '☄️', '💫'];
   const userEmoji = process.env.EMOJIS?.split(',');
   const emoji = pick(
@@ -115,7 +113,6 @@ function getCoAuthorsMessage(names) {
       'Featuring contributions by <names>! 🌟',
     ];
   }
-  console.log({ messages });
   const chosenMessage = pick(messages);
   return '_' + chosenMessage.replace('<names>', names).trim() + '_';
 }

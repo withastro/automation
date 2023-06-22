@@ -37,7 +37,11 @@ function setDiscordMessage(author, id, commitMsg, repo) {
     coAuthorThanks = '\n' + getCoAuthorsMessage(names);
   }
 
-  const emoji = pick(['🎉', '🎊', '🧑‍🚀', '🥳', '🙌', '🚀', '🤩', '☄️', '💫']);
+  const defaultEmoji = ['🎉', '🎊', '🧑‍🚀', '🥳', '🙌', '🚀', '🤩', '☄️', '💫'];
+  const userEmoji = process.env.EMOJIS?.split(',');
+  const emoji = pick(
+    userEmoji && userEmoji.length > 0 ? userEmoji : defaultEmoji
+  );
 
   setGitHubActionOutput(
     'DISCORD_MESSAGE',
@@ -88,15 +92,27 @@ function pick(items) {
  * @param {string} names Names of co-authors to be thanked
  */
 function getCoAuthorsMessage(names) {
-  const messages = [
-    '_Thanks <names> for helping!_ ✨',
-    '_<names> stepped up to lend a hand — thank you!_ 🙌',
-    '_<names> with the assist!_ 💪',
-    '_Couldn’t have done this without <names>!_ 💖',
-    '_Made even better by <names>!_ 🚀',
-    '_And the team effort award goes to… <names>!_ 🏆',
-    '_Featuring contributions by <names>!_ 🌟',
-  ];
+  /** @type {string[]} */
+  let messages = [];
+  try {
+    messages = JSON.parse(process.env.COAUTHOR_TEMPLATES || '[]');
+  } catch (err) {
+    console.error(
+      'Failed to parse `COAUTHOR_TEMPLATES` as JSON. Falling back to default templates.\n ',
+      err
+    );
+  }
+  if (!messages || messages.length === 0) {
+    messages = [
+      'Thanks <names> for helping! ✨',
+      '<names> stepped up to lend a hand — thank you! 🙌',
+      '<names> with the assist! 💪',
+      'Couldn’t have done this without <names>! 💖',
+      'Made even better by <names>! 🚀',
+      'And the team effort award goes to… <names>! 🏆',
+      'Featuring contributions by <names>! 🌟',
+    ];
+  }
   const chosenMessage = pick(messages);
-  return chosenMessage.replace('<names>', names);
+  return '_' + chosenMessage.replace('<names>', names).trim() + '_';
 }

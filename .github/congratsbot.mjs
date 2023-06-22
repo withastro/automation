@@ -27,8 +27,8 @@ function setDiscordMessage(author, id, commitMsg, repo) {
   const coAuthors = commitMsg
     .split('\n')
     .slice(2)
-    .filter((line) => line.match(/Co-authored-by: (.+) <.+>/))
-    .map((line) => line.match(/Co-authored-by: (.+) <.+>/)[1]);
+    .filter((line) => line.match(/Co-authored-by: (.+) <.+>/i))
+    .map((line) => line.match(/Co-authored-by: (.+) <.+>/i)[1]);
 
   let coAuthorThanks = '';
   if (coAuthors.length) {

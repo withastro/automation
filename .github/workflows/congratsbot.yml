@@ -4,6 +4,12 @@ on:
   workflow_call:
     secrets:
       DISCORD_WEBHOOK:
+        description: >
+          URL of a Discord webhook. To create one:
+            1. Find the channel you want to post congrats in.
+            2. Right-click and select “Edit Channel”.
+            3. Navigate to “Integrations” > “View Webhooks”.
+            4. Click “New Webhook” and copy the URL for your newly created webhook.
         required: true
     inputs:
       EMOJIS:

@@ -68,7 +68,7 @@ A JSON array of co-author recognition templates.
 Each template should contain the `<names>` placeholder to be replaced by the names of one or more co-authors for this commit.
 (Ignored for commits without any co-authors.)
 
-When designing templates, bear in mind that `<names>` could be one, two, or more names.
+When writing congrats messages, remember that `<names>` could be one, two, or more names. So, create messages that can work for both a single co-author and for several people, for example, "This PR was made even better by `<names>`!"
 
 ## [`format.yml`](./.github/workflows/format.yml)
 

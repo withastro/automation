@@ -4,20 +4,41 @@ on:
   workflow_call:
     secrets:
       DISCORD_WEBHOOK:
+        description: >
+          URL of a Discord webhook. To create one:
+            1. Find the channel you want to post congrats in.
+            2. Right-click and select “Edit Channel”.
+            3. Navigate to “Integrations” > “View Webhooks”.
+            4. Click “New Webhook” and copy the URL for your newly created webhook.
         required: true
     inputs:
-      GITHUB_REPO:
-        required: true
+      EMOJIS:
+        description: >
+          Comma-delimited set of emojis.
+          Each congrats bot message will pick one at random for the start of the message.
+        default: 🎉,🎊,🧑‍🚀,🥳,🙌,🚀
         type: string
-      COMMIT_AUTHOR:
-        required: true
+        required: false
+      COAUTHOR_TEMPLATES:
+        description: >
+          A JSON array of co-author recognition templates.
+          Each template should contain the `<names>` placeholder.
+          This will be replaced by the names of one or more co-authors for this commit.
+          (Ignored for commits without any co-authors.)
+
+          When designing templates, bear in mind that `<names>` could be one, two, or more names.
+        default: >
+          [
+            "Thanks <names> for helping! ✨",
+            "<names> stepped up to lend a hand — thank you! 🙌",
+            "<names> with the assist! 💪",
+            "Couldn’t have done this without <names>! 💜",
+            "Made even better by <names>! 🚀",
+            "And the team effort award goes to… <names>! 🏆",
+            "Featuring contributions by <names>! 🌟"
+          ]
         type: string
-      COMMIT_MESSAGE:
-        required: true
-        type: string
-      COMMIT_ID:
-        required: true
-        type: string
+        required: false
 
 jobs:
   post-message:
@@ -38,10 +59,12 @@ jobs:
       - id: message
         name: Format Discord message
         env:
-          GITHUB_REPO: ${{ inputs.GITHUB_REPO }}
-          COMMIT_AUTHOR: ${{ inputs.COMMIT_AUTHOR }}
-          COMMIT_MESSAGE: ${{ inputs.COMMIT_MESSAGE }}
-          COMMIT_ID: ${{ inputs.COMMIT_ID }}
+          GITHUB_REPO: ${{ github.event.repository.full_name }}
+          COMMIT_AUTHOR: ${{ github.event.commits[0].author.name }}
+          COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
+          COMMIT_ID: ${{ github.event.commits[0].id }}
+          EMOJIS: ${{ inputs.EMOJIS }}
+          COAUTHOR_TEMPLATES: ${{ inputs.COAUTHOR_TEMPLATES }}
         run: node automation/.github/congratsbot.mjs
 
       - name: Send message on Discord

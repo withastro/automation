@@ -55,7 +55,7 @@ jobs:
 
 #### `EMOJIS`
 
-**default:** `🎉,🎊,🧑‍🚀,🥳,🙌,🚀,🤩,☄️,💫`
+**default:** `🎉,🎊,🧑‍🚀,🥳,🙌,🚀`
 
 A comma-delimited set of emojis.
 Each congrats bot message will pick one at random for the start of the message.

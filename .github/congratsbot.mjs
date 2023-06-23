@@ -37,7 +37,7 @@ function setDiscordMessage(author, id, commitMsg, repo) {
     coAuthorThanks = '\n' + getCoAuthorsMessage(names);
   }
 
-  const defaultEmoji = ['🎉', '🎊', '🧑‍🚀', '🥳', '🙌', '🚀', '🤩', '☄️', '💫'];
+  const defaultEmoji = ['🎉', '🎊', '🧑‍🚀', '🥳', '🙌', '🚀'];
   const userEmoji = process.env.EMOJIS?.split(',');
   const emoji = pick(
     userEmoji && userEmoji.length > 0 ? userEmoji : defaultEmoji
@@ -107,7 +107,7 @@ function getCoAuthorsMessage(names) {
       'Thanks <names> for helping! ✨',
       '<names> stepped up to lend a hand — thank you! 🙌',
       '<names> with the assist! 💪',
-      'Couldn’t have done this without <names>! 💖',
+      'Couldn’t have done this without <names>! 💜',
       'Made even better by <names>! 🚀',
       'And the team effort award goes to… <names>! 🏆',
       'Featuring contributions by <names>! 🌟',

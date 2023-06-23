@@ -16,7 +16,7 @@ on:
         description: >
           Comma-delimited set of emojis.
           Each congrats bot message will pick one at random for the start of the message.
-        default: 🎉,🎊,🧑‍🚀,🥳,🙌,🚀,🤩,☄️,💫
+        default: 🎉,🎊,🧑‍🚀,🥳,🙌,🚀
         type: string
         required: false
       COAUTHOR_TEMPLATES:
@@ -32,7 +32,7 @@ on:
             "Thanks <names> for helping! ✨",
             "<names> stepped up to lend a hand — thank you! 🙌",
             "<names> with the assist! 💪",
-            "Couldn’t have done this without <names>! 💖",
+            "Couldn’t have done this without <names>! 💜",
             "Made even better by <names>! 🚀",
             "And the team effort award goes to… <names>! 🏆",
             "Featuring contributions by <names>! 🌟"

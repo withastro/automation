@@ -33,7 +33,12 @@ function setDiscordMessage(author, id, commitMsg, repo) {
   let coAuthorThanks = '';
   if (coAuthors.length) {
     const uniqueCoAuthors = [...new Set(coAuthors)];
-    const names = makeList(uniqueCoAuthors);
+    const names = makeList(uniqueCoAuthors).filter(name => 
+    {
+        if(name == "github-actions[bot]")
+            return false;
+        return true;
+    });
     coAuthorThanks = '\n' + getCoAuthorsMessage(names);
   }
 

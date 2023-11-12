@@ -1,9 +1,5 @@
 name: Label issues
 on:
-  issues:
-    types:
-      - reopened
-      - opened
   workflow_call:
 
 jobs:

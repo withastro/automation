@@ -1,15 +1,14 @@
 name: Issue Labeled
 
 on:
-  issues:
-    types: [labeled]
   workflow_call:
     inputs:
-        repro_message_content:
-          description: 'The message to post when the issue is labeled with `needs repro`'
-          default: 'Hello @${{ github.event.issue.user.login }}. Please provide a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) using a GitHub repository or [StackBlitz](https://astro.new). Issues marked with `needs repro` will be closed if they have no activity within 3 days.'
-          required: false
-          type: string
+      repro_message_content:
+        description: "The message to post when the issue is labeled with `needs repro`"
+        default: |
+          Hello @${{ github.event.issue.user.login }}. Please provide a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) using a GitHub repository or [StackBlitz](https://astro.new). Issues marked with `needs repro` will be closed if they have no activity within 3 days.
+        required: false
+        type: string
 
 jobs:
   reply-labeled:
@@ -32,5 +31,5 @@ jobs:
           actions: "create-comment, remove-labels"
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ github.event.inputs.repro_message_content }}
+          body: ${{ inputs.repro_message_content }}
           labels: "needs triage"

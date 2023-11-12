@@ -4,10 +4,10 @@ const { COMMIT_AUTHOR, COMMIT_ID, COMMIT_MESSAGE, GITHUB_REPO } = process.env;
 if (!COMMIT_AUTHOR || !COMMIT_ID || !COMMIT_MESSAGE || !GITHUB_REPO) {
   throw new Error(
     'Missing input.\n' +
-      'Required environment variables: COMMIT_AUTHOR, COMMIT_ID, COMMIT_MESSAGE, GITHUB_REPO\n\n' +
-      'Available environment variables: ' +
-      Object.keys(process.env).join(', ') +
-      '\n'
+    'Required environment variables: COMMIT_AUTHOR, COMMIT_ID, COMMIT_MESSAGE, GITHUB_REPO\n\n' +
+    'Available environment variables: ' +
+    Object.keys(process.env).join(', ') +
+    '\n'
   );
 }
 setDiscordMessage(COMMIT_AUTHOR, COMMIT_ID, COMMIT_MESSAGE, GITHUB_REPO);
@@ -32,7 +32,10 @@ function setDiscordMessage(author, id, commitMsg, repo) {
 
   let coAuthorThanks = '';
   if (coAuthors.length) {
-    const uniqueCoAuthors = [...new Set(coAuthors)];
+    const uniqueCoAuthors = [...new Set(coAuthors)].filter(name => {
+      if (name == "github-actions[bot]") return false;
+      return true;
+    });
     const names = makeList(uniqueCoAuthors);
     coAuthorThanks = '\n' + getCoAuthorsMessage(names);
   }

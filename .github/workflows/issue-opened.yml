@@ -4,6 +4,7 @@ on:
     types:
       - reopened
       - opened
+  workflow_call:
 
 jobs:
   label_issues:

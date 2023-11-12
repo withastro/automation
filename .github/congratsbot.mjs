@@ -28,15 +28,13 @@ function setDiscordMessage(author, id, commitMsg, repo) {
     .split('\n')
     .slice(2)
     .filter((line) => line.match(/Co-authored-by: (.+) <.+>/i))
-    .map((line) => line.match(/Co-authored-by: (.+) <.+>/i)[1]);
+    .map((line) => line.match(/Co-authored-by: (.+) <.+>/i)[1])
+    .filter(name => name !== 'github-actions[bot]');
 
   let coAuthorThanks = '';
-  if (coAuthors.length) {
-    const uniqueCoAuthors = [...new Set(coAuthors)].filter(name => {
-      if (name == "github-actions[bot]") return false;
-      return true;
-    });
-    const names = makeList(uniqueCoAuthors);
+  if (coAuthors.length > 0) {
+    const uniqueCoAuthors = [...new Set(coAuthors)]
+    const names = formatAsCommaSeparatedList(uniqueCoAuthors);
     coAuthorThanks = '\n' + getCoAuthorsMessage(names);
   }
 
@@ -77,7 +75,7 @@ function escapeData(str) {
  * like `['foo', 'bar', 'baz']`.
  * @param {string[]} list List of words to format
  */
-function makeList(list) {
+function formatAsCommaSeparatedList(list) {
   if (list.length === 1) return list[0];
   return list.slice(0, -1).join(', ') + ' & ' + list.at(-1);
 }

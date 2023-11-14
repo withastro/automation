@@ -44,3 +44,4 @@ jobs:
           branch: ${{ github.head_ref }}
           commit_user_name: astrobot-houston
           commit_user_email: fred+astrobot@astro.build
+          commit_author: ${{ github.event.commits[0].author.name }} <${{ github.actor }}@users.noreply.github.com>

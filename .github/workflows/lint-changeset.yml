@@ -15,16 +15,12 @@ jobs:
           ref: "main"
           path: "automation"
 
-      - uses: pnpm/action-setup@v2
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
 
-      - run: pnpm install
-        working-directory: automation
+      - run: npm install compromise
 
       - uses: actions/github-script@v7
         with:

@@ -23,6 +23,11 @@ jobs:
       - run: npm install compromise
 
       - uses: actions/github-script@v7
+        env:
+          GITHUB_REPO: ${{ github.event.repository.full_name }}
+          COMMIT_AUTHOR: ${{ github.event.commits[0].author.name }}
+          COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
+          COMMIT_ID: ${{ github.event.commits[0].id }}
         with:
           script: |
             const { default: lint } = await import('${{ github.workspace }}/automation/.github/congratsbot.mjs')

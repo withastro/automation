@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "packageManager": "npm@10.2.5",
+  "dependencies": {
+    "compromise": "^14.10.1"
+  },
+  "devDependencies": {
+    "@types/github-script": "github:actions/github-script"
+  }
+}

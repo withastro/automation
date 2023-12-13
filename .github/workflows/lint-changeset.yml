@@ -1,0 +1,34 @@
+name: Lint Changeset
+
+on:
+  workflow_call:
+
+jobs:
+  lint-changeset:
+    if: github.repository_owner == 'withastro'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: "withastro/automation"
+          ref: "main"
+          path: "automation"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install compromise
+
+      - uses: actions/github-script@v7
+        env:
+          GITHUB_REPO: ${{ github.event.repository.full_name }}
+          COMMIT_AUTHOR: ${{ github.event.commits[0].author.name }}
+          COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
+          COMMIT_ID: ${{ github.event.commits[0].id }}
+        with:
+          script: |
+            const { default: lint } = await import('${{ github.workspace }}/automation/.github/congratsbot.mjs')
+            await lint({ context, core, github, exec, glob, io })

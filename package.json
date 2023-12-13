@@ -1,3 +1,10 @@
 {
-  "type": "module"
+  "type": "module",
+  "packageManager": "pnpm@8.12.1",
+  "dependencies": {
+    "compromise": "^14.10.1"
+  },
+  "devDependencies": {
+    "@types/github-script": "github:actions/github-script"
+  }
 }

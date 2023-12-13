@@ -8,14 +8,21 @@ jobs:
     if: github.repository_owner == 'withastro'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          node-version: "20.x"
-      - run: npm install compromise
+          repository: "withastro/automation"
+          ref: "main"
+          path: "automation"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
       - uses: actions/github-script@v7
         with:
           script: |
-            import nlp from 'compromise'
-            console.log(context)
-            console.log(nlp)
+            const { default: lint } = await import('automation/.github/congratsbot.mjs')
+            await lint({ context, core, github, exec, glob, io })

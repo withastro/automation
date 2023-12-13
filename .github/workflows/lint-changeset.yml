@@ -1,0 +1,21 @@
+name: Lint Changeset
+
+on:
+  workflow_call:
+
+jobs:
+  lint-changeset:
+    if: github.repository_owner == 'withastro'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - run: npm install compromise
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            import nlp from 'compromise'
+            console.log(context)
+            console.log(nlp)

@@ -1,4 +1,4 @@
-import { EOL } from 'node:os';
+import { setOutput } from './utils.mjs'
 
 const { COMMIT_AUTHOR, COMMIT_ID, COMMIT_MESSAGE, GITHUB_REPO } = process.env;
 if (!COMMIT_AUTHOR || !COMMIT_ID || !COMMIT_MESSAGE || !GITHUB_REPO) {
@@ -44,30 +44,10 @@ function setDiscordMessage(author, id, commitMsg, repo) {
     userEmoji && userEmoji.length > 0 ? userEmoji : defaultEmoji
   );
 
-  setGitHubActionOutput(
+  setOutput(
     'DISCORD_MESSAGE',
     `${emoji} **Merged!** ${author}: [\`${commitMessage}\`](<https://github.com/${repo}/commit/${id}>)${coAuthorThanks}`
   );
-}
-
-/**
- * Based on `setOutput` and `issueCommand` in `@actions/core` to avoid the additional dependency.
- * @see https://github.com/actions/toolkit/blob/a6bf8726aa7b78d4fc8111359cca5d538527b239/packages/core/src/core.ts#L192
- * @see https://github.com/actions/toolkit/blob/a6bf8726aa7b78d4fc8111359cca5d538527b239/packages/core/src/command.ts#L23
- * @param {string} name Name of the output value to set
- * @param {string} value Value to set
- */
-function setGitHubActionOutput(name, value) {
-  process.stdout.write(EOL);
-  process.stdout.write(`::set-output name=${name}::` + escapeData(value) + EOL);
-}
-
-/**
- * Based on https://github.com/actions/toolkit/blob/a6bf8726aa7b78d4fc8111359cca5d538527b239/packages/core/src/command.ts#LL80C1-L85C2
- * @param {string} str
- */
-function escapeData(str) {
-  return str.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
 }
 
 /**

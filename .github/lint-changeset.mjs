@@ -1,8 +1,14 @@
 import nlp from 'compromise';
 
-// @ts-check
-/** @param {import('@types/github-script').AsyncFunctionArguments} AsyncFunctionArguments */
-export default function lint({ core, context, github }) {
-    const pr = context.payload.pull_request
-    console.log("Hello world!", { pr, nlp })
+export default async function main() {
+    const text = 'Fixes an issue with the implementation of a specific feature.'
+    const isPresentTense = await lint(text)
+    console.log({ isPresentTense });
+}
+
+await main();
+
+async function lint(text) {
+    const doc = nlp(text);
+    return doc.sentences().toPresentTense().text() === text;
 }

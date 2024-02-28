@@ -5,7 +5,7 @@ on:
     inputs:
       command:
         description: 'The package.json script name which will be called via "pnpm run <command>"'
-        default: 'format'
+        default: "format"
         required: false
         type: string
 
@@ -16,27 +16,27 @@ jobs:
     env:
       NODE_OPTIONS: "--max_old_space_size=4096"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           # Needs access to push to main
           token: ${{ secrets.FREDKBOT_GITHUB_TOKEN }}
-      
+
       - name: Setup PNPM
-        uses: pnpm/action-setup@v2
-      
+        uses: pnpm/action-setup@v3
+
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "pnpm"
-      
+
       - name: Install dependencies
         run: pnpm install
-      
+
       - name: Format code
         run: pnpm run ${{ inputs.command }}
-      
+
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:

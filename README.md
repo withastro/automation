@@ -94,25 +94,3 @@ jobs:
       command: 'format:ci'
     secrets: inherit
 ```
-
-## [`lockfile.yml`](./.github/workflows/lockfile.yml)
-
-This workflow updates a repository’s `pnpm-lock.yaml` and opens a PR with the changes if there are any.
-
-### Usage
-
-```yml
-name: Nightly
-
-on:
-  workflow_dispatch:
-  schedule:
-    # Run every Monday at 12:00 UTC
-    - cron: '0 12 * * 1'
-
-jobs:
-  lockfile:
-    if: github.repository_owner == 'withastro'
-    uses: withastro/automation/.github/workflows/lockfile.yml@main
-    secrets: inherit
-```

@@ -28,7 +28,7 @@ on:
 jobs:
   congrats:
     if: ${{ github.repository_owner == 'withastro' }}
-    uses: withastro/automation/.github/workflows/congratsbot.yml@main
+    uses: withastro/automation/.github/workflows/congratsbot.yml@<commit-sha> # vX.Y.Z
     secrets:
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_CONGRATS }}
 ```
@@ -41,7 +41,7 @@ You can customize the emojis and co-author message templates to give your reposi
 jobs:
   congrats:
     if: ${{ github.repository_owner == 'withastro' }}
-    uses: withastro/automation/.github/workflows/congratsbot.yml@main
+    uses: withastro/automation/.github/workflows/congratsbot.yml@<commit-sha> # vX.Y.Z
     with:
       EMOJIS: 🤖,👻,😱
       COAUTHOR_TEMPLATES: >
@@ -88,7 +88,7 @@ on:
 jobs:
   prettier:
     if: github.repository_owner == 'withastro'
-    uses: withastro/automation/.github/workflows/format.yml@main
+    uses: withastro/automation/.github/workflows/format.yml@<commit-sha> # vX.Y.Z
     with:
       # Set command to this repository’s package script that runs Prettier
       command: 'format:ci'

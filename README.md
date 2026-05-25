@@ -94,3 +94,12 @@ jobs:
       command: 'format:ci'
     secrets: inherit
 ```
+
+## Releases
+
+To publish a new release of the reusable workflows:
+
+1. Merge the desired changes to main.
+1. Review the automatically generated draft release.
+1. Update the release tag and title if needed.
+1. Publish the release.

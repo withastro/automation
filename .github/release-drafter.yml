@@ -9,6 +9,7 @@ template: |
 change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 categories:
   - type: "pre-exclude"
+    title: "Internal dependencies to ignore"
     when:
       paths-mode: only
       paths:

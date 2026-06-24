@@ -7,6 +7,11 @@ template: |
 
   See details of [all code changes](https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION) since previous release.
 change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
-exclude-paths:
-  - ".github/workflows/draft-release.yml"
-  - ".github/release-drafter.yml"
+categories:
+  - type: "pre-exclude"
+    title: "Internal dependencies to ignore"
+    when:
+      paths-mode: only
+      paths:
+        - ".github/workflows/draft-release.yml"
+        - ".github/release-drafter.yml"

@@ -95,6 +95,81 @@ jobs:
     secrets: inherit
 ```
 
+## [`cloudflare-deploy.yml`](./.github/workflows/cloudflare-deploy.yml)
+
+This workflow deploys a Cloudflare Worker to production on pushes, and on pull requests uploads the build output and PR metadata for [`cloudflare-deploy-preview.yml`](#cloudflare-deploy-previewyml) to publish a preview. It requires a `CLOUDFLARE_API_TOKEN` secret and a `wrangler.jsonc` whose `name` matches the Worker.
+
+### Usage
+
+```yml
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  deploy:
+    if: github.repository_owner == 'withastro'
+    permissions:
+      contents: read
+    uses: withastro/automation/.github/workflows/cloudflare-deploy.yml@<commit-sha> # vX.Y.Z
+    with:
+      preview-domain: previews.my-worker.astro.build
+      artifact-paths: |
+        dist/
+        worker.js
+        wrangler.jsonc
+      # Optional build setup, omit for a repo with no build step:
+      node-version: '24.18.0'
+      install-command: 'pnpm install'
+      build-command: 'pnpm build'
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+```
+
+See the [workflow inputs](./.github/workflows/cloudflare-deploy.yml) for the full list of options.
+
+## [`cloudflare-deploy-preview.yml`](./.github/workflows/cloudflare-deploy-preview.yml)
+
+This workflow publishes a Cloudflare Worker preview for a pull request and comments the preview URL. It runs from the trusted base-repo context (via `workflow_run`) so it can deploy fork PRs safely without exposing the token. Use it alongside [`cloudflare-deploy.yml`](#cloudflare-deployyml).
+
+### Usage
+
+```yml
+name: Deploy Preview
+
+on:
+  workflow_run:
+    workflows: ['Deploy']
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  deploy-preview:
+    if: github.repository_owner == 'withastro'
+    permissions:
+      pull-requests: write
+    uses: withastro/automation/.github/workflows/cloudflare-deploy-preview.yml@<commit-sha> # vX.Y.Z
+    with:
+      worker-name: my-worker
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+```
+
+### How fork previews stay safe
+
+GitHub doesn't give fork pull requests access to secrets, so the two workflows split the work:
+
+- `Deploy` runs on the PR **without the token**. It only builds and uploads the result as an artifact — it never deploys.
+- `Deploy Preview` then runs on `workflow_run`, using the workflow file from your default branch **with the token**. It only downloads that artifact and publishes the preview — it never runs the fork's code.
+
+So the untrusted side never sees the token, and the trusted side never runs untrusted code.
+
 ## Releases
 
 To publish a new release of the reusable workflows:

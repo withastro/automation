@@ -1,0 +1,156 @@
+name: Cloudflare Deploy
+
+# Reusable workflow that deploys a Cloudflare Worker on pushes to a production
+# branch, and on pull requests uploads the build output + PR metadata so that
+# the companion `cloudflare-deploy-preview.yml` workflow can publish a preview
+# from the trusted base-repo context.
+#
+# This is one half of a two-workflow split. The split is required for security:
+# this workflow runs on the `pull_request` event (untrusted fork code, no access
+# to the Cloudflare token on forks), so it never deploys PR code directly. It
+# only deploys to production on `push`, and hands PRs off via artifacts.
+#
+# See `cloudflare-deploy-preview.yml` for the second half.
+
+on:
+  workflow_call:
+    inputs:
+      preview-domain:
+        description: >
+          Base domain used to build preview URLs, e.g. "previews.docs.astro.build".
+          The branch alias is prepended, producing "<alias>.previews.docs.astro.build".
+        required: true
+        type: string
+      artifact-paths:
+        description: >
+          Newline-delimited list of files/directories to upload as the preview
+          build output (consumed by cloudflare-deploy-preview.yml). Must include
+          your wrangler config and everything `wrangler deploy` needs, e.g.:
+            dist/
+            worker.js
+            wrangler.jsonc
+        required: true
+        type: string
+      deploy-command:
+        description: 'The wrangler-action command used for the production deploy.'
+        required: false
+        type: string
+        default: "deploy"
+      build-command:
+        description: 'Optional shell command that produces the build output. Skipped when empty.'
+        required: false
+        type: string
+        default: ""
+      install-command:
+        description: 'Optional shell command to install dependencies (e.g. "pnpm install"). Skipped when empty.'
+        required: false
+        type: string
+        default: ""
+      node-version:
+        description: 'If set, Node.js (and pnpm when package-manager is "pnpm") is installed with this version.'
+        required: false
+        type: string
+        default: ""
+      package-manager:
+        description: 'Package manager used for dependency caching: "pnpm" or "npm".'
+        required: false
+        type: string
+        default: "pnpm"
+      node-options:
+        description: 'Optional value for the NODE_OPTIONS env var during the build (e.g. "--max_old_space_size=8192").'
+        required: false
+        type: string
+        default: ""
+      wrangler-version:
+        description: 'Pin the wrangler version used by wrangler-action. Uses the action default when empty.'
+        required: false
+        type: string
+        default: ""
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        description: 'Cloudflare API token with permission to deploy the Worker.'
+        required: true
+
+# Automatically cancel in-progress runs on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ github.repository_owner == 'withastro' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      NODE_OPTIONS: ${{ inputs.node-options }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup PNPM
+        if: ${{ inputs.node-version != '' && inputs.package-manager == 'pnpm' }}
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Setup Node
+        if: ${{ inputs.node-version != '' }}
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: ${{ inputs.package-manager }}
+
+      - name: Install dependencies
+        if: ${{ inputs.install-command != '' }}
+        run: ${{ inputs.install-command }}
+
+      - name: Build
+        if: ${{ inputs.build-command != '' }}
+        run: ${{ inputs.build-command }}
+
+      - name: Deploy
+        # Production deploy only. This runs on `push` (e.g. merges to a
+        # production branch), never on `pull_request`, so it is skipped for
+        # PRs — including fork PRs, which don't have access to the token.
+        if: ${{ github.event_name == 'push' }}
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: ${{ inputs.wrangler-version }}
+          command: ${{ inputs.deploy-command }}
+
+      - name: Upload build output
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-output
+          path: ${{ inputs.artifact-paths }}
+
+      - name: Save PR metadata
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.head_ref }}
+          PREVIEW_DOMAIN: ${{ inputs.preview-domain }}
+        run: |
+          mkdir -p pr-metadata
+          echo "$PR_NUMBER" > pr-metadata/pr_number
+          BRANCH="$HEAD_REF"
+          # Sanitize branch name into a valid Wrangler preview alias.
+          # Wrangler validates aliases against /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/i so the
+          # alias must start with a letter, contain only [a-z0-9-], and end with a letter
+          # or digit. It is also used as the subdomain for the preview URL, e.g.
+          # "my-branch.previews.docs.astro.build".
+          ALIAS=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-//' | sed 's/-$//')
+          # Prefix "pr-" if the alias starts with a digit (e.g. branch "260616") so it
+          # satisfies the "must start with a letter" rule.
+          [[ "$ALIAS" =~ ^[0-9] ]] && ALIAS="pr-$ALIAS"
+          echo "$ALIAS" > pr-metadata/preview_alias
+          echo "https://${ALIAS}.${PREVIEW_DOMAIN}" > pr-metadata/preview_url
+
+      - name: Upload PR metadata
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-metadata
+          path: pr-metadata/

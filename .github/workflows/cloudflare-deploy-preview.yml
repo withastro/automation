@@ -114,6 +114,10 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           wranglerVersion: ${{ inputs.wrangler-version }}
+          # Install wrangler with npm (always present on the runner). Otherwise
+          # wrangler-action infers the package manager from a lockfile in the
+          # downloaded artifact and fails when e.g. pnpm isn't set up.
+          packageManager: npm
           # Always create the preview on the named Worker so previews use its
           # preview domain, even for PRs targeting version branches.
           command: preview --worker-name ${{ inputs.worker-name }} --name "${{ steps.metadata.outputs.preview_alias }}"

@@ -117,6 +117,10 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           wranglerVersion: ${{ inputs.wrangler-version }}
+          # Install wrangler with npm (always present on the runner). Otherwise
+          # wrangler-action infers the package manager from the repo's lockfile
+          # and fails when e.g. pnpm isn't set up (repos with no build step).
+          packageManager: npm
           command: ${{ inputs.deploy-command }}
 
       - name: Upload build output

@@ -109,6 +109,8 @@ on:
     branches: [main]
   pull_request:
 
+permissions: {}
+
 jobs:
   deploy:
     if: github.repository_owner == 'withastro'

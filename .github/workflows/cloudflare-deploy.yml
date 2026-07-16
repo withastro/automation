@@ -109,6 +109,9 @@ jobs:
         run: ${{ inputs.build-command }}
 
       - name: Deploy
+        # Production deploy only. This runs on `push` (e.g. merges to a
+        # production branch), never on `pull_request`, so it is skipped for
+        # PRs — including fork PRs, which don't have access to the token.
         if: ${{ github.event_name == 'push' }}
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:

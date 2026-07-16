@@ -157,6 +157,15 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 ```
 
+### How fork previews stay safe
+
+GitHub doesn't give fork pull requests access to secrets, so the two workflows split the work:
+
+- `Deploy` runs on the PR **without the token**. It only builds and uploads the result as an artifact — it never deploys.
+- `Deploy Preview` then runs on `workflow_run`, using the workflow file from your default branch **with the token**. It only downloads that artifact and publishes the preview — it never runs the fork's code.
+
+So the untrusted side never sees the token, and the trusted side never runs untrusted code.
+
 ## Releases
 
 To publish a new release of the reusable workflows:

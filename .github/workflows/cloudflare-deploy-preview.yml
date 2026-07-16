@@ -74,10 +74,12 @@ jobs:
             const commitSHA = '${{ github.event.workflow_run.head_sha }}';
             const runUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const body = `**Preview deployment**\n\n`
-              + `🔄 Deployment in progress...\n\n`
-              + `- **Latest commit:** ${commitSHA}\n`
-              + `- **Preview:** ${previewUrl}\n`
-              + `- **Workflow run:** [View logs](${runUrl})`;
+              + `| | |\n`
+              + `| :-- | :-- |\n`
+              + `| **Status** | 🔄 In progress… |\n`
+              + `| **Preview** | ${previewUrl} |\n`
+              + `| **Commit** | \`${commitSHA}\` |\n`
+              + `| **Logs** | [View logs](${runUrl}) |`;
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -126,10 +128,12 @@ jobs:
             const commitSHA = '${{ github.event.workflow_run.head_sha }}';
             const runUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const body = `**Preview deployment**\n\n`
-              + `✅ Deployment complete!\n\n`
-              + `- **Latest commit:** ${commitSHA}\n`
-              + `- **Preview:** ${previewUrl}\n`
-              + `- **Workflow run:** [View logs](${runUrl})`;
+              + `| | |\n`
+              + `| :-- | :-- |\n`
+              + `| **Status** | ✅ Complete! |\n`
+              + `| **Preview** | ${previewUrl} |\n`
+              + `| **Commit** | \`${commitSHA}\` |\n`
+              + `| **Logs** | [View logs](${runUrl}) |`;
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -154,9 +158,11 @@ jobs:
             const commitSHA = '${{ github.event.workflow_run.head_sha }}';
             const runUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const body = `**Preview deployment**\n\n`
-              + `❌ Deployment failed!\n\n`
-              + `- **Latest commit:** ${commitSHA}\n`
-              + `- **Workflow run:** [View logs](${runUrl})`;
+              + `| | |\n`
+              + `| :-- | :-- |\n`
+              + `| **Status** | ❌ Failed! |\n`
+              + `| **Commit** | \`${commitSHA}\` |\n`
+              + `| **Logs** | [View logs](${runUrl}) |`;
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,

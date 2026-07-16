@@ -95,21 +95,11 @@ jobs:
     secrets: inherit
 ```
 
-## Cloudflare Worker deploys
+## [`cloudflare-deploy.yml`](./.github/workflows/cloudflare-deploy.yml)
 
-Two reusable workflows deploy a Cloudflare Worker to production on pushes and publish per-PR previews. They are split into two files on purpose, for security: the deploy workflow runs on the `pull_request` event (untrusted fork code, no token on forks) and never deploys PR code — it only deploys to production on `push` and hands PRs off as artifacts. The preview workflow runs on `workflow_run` in the trusted base-repo context, consuming only those artifacts (it never checks out or runs PR code) and interpolating only sanitized values (a numeric PR number and an `[a-z0-9-]` alias).
+This workflow deploys a Cloudflare Worker to production on pushes, and on pull requests uploads the build output and PR metadata for [`cloudflare-deploy-preview.yml`](#cloudflare-deploy-previewyml) to publish a preview. It requires a `CLOUDFLARE_API_TOKEN` secret and a `wrangler.jsonc` whose `name` matches the Worker.
 
-Using both gives you production deploys on your default branch plus a `https://<branch-alias>.<preview-domain>` preview commented on every PR.
-
-### Prerequisites
-
-- Add a `CLOUDFLARE_API_TOKEN` secret to the repository, with permission to deploy the Worker.
-- The Worker must already exist in Cloudflare, and its preview domain must be configured (so `<alias>.<preview-domain>` resolves).
-- A `wrangler.jsonc` in the repo whose `name` matches the deployed Worker.
-
-### [`cloudflare-deploy.yml`](./.github/workflows/cloudflare-deploy.yml)
-
-Call this from a workflow named `Deploy` (the name is referenced by the preview workflow) that triggers on `push` to your production branch(es) and on `pull_request`:
+### Usage
 
 ```yml
 name: Deploy
@@ -131,39 +121,28 @@ jobs:
         dist/
         worker.js
         wrangler.jsonc
-      # Optional build setup (omit all of these for a repo with no build step):
-      node-version: "24.18.0"
-      package-manager: pnpm
-      install-command: pnpm install
-      build-command: pnpm build
+      # Optional build setup, omit for a repo with no build step:
+      node-version: '24.18.0'
+      install-command: 'pnpm install'
+      build-command: 'pnpm build'
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 ```
 
-#### Inputs
+See the [workflow inputs](./.github/workflows/cloudflare-deploy.yml) for the full list of options.
 
-| Input | Required | Default | Description |
-| --- | --- | --- | --- |
-| `preview-domain` | yes | — | Base domain for preview URLs, e.g. `previews.docs.astro.build`. The branch alias is prepended. |
-| `artifact-paths` | yes | — | Newline-delimited files/dirs to hand off to the preview workflow. Must include your wrangler config and everything `wrangler deploy` needs. |
-| `deploy-command` | no | `deploy` | The `wrangler-action` command used for the production deploy. |
-| `build-command` | no | `""` | Shell command that produces the build output. Skipped when empty. |
-| `install-command` | no | `""` | Shell command to install dependencies (e.g. `pnpm install`). Skipped when empty. |
-| `node-version` | no | `""` | If set, installs Node.js (and pnpm when `package-manager` is `pnpm`). |
-| `package-manager` | no | `pnpm` | Package manager used for dependency caching: `pnpm` or `npm`. |
-| `node-options` | no | `""` | Value for `NODE_OPTIONS` during the build (e.g. `--max_old_space_size=8192`). |
-| `wrangler-version` | no | `""` | Pin the wrangler version used by `wrangler-action`. |
+## [`cloudflare-deploy-preview.yml`](./.github/workflows/cloudflare-deploy-preview.yml)
 
-### [`cloudflare-deploy-preview.yml`](./.github/workflows/cloudflare-deploy-preview.yml)
+This workflow publishes a Cloudflare Worker preview for a pull request and comments the preview URL. It runs from the trusted base-repo context (via `workflow_run`) so it can deploy fork PRs safely without exposing the token. Use it alongside [`cloudflare-deploy.yml`](#cloudflare-deployyml).
 
-Call this from a second workflow triggered by `workflow_run` on completion of your `Deploy` workflow:
+### Usage
 
 ```yml
 name: Deploy Preview
 
 on:
   workflow_run:
-    workflows: ["Deploy"]
+    workflows: ['Deploy']
     types: [completed]
 
 jobs:
@@ -177,13 +156,6 @@ jobs:
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 ```
-
-#### Inputs
-
-| Input | Required | Default | Description |
-| --- | --- | --- | --- |
-| `worker-name` | yes | — | Worker to publish the preview against. Previews are always created on this Worker so they resolve on its preview domain. |
-| `wrangler-version` | no | `""` | Pin the wrangler version used by `wrangler-action`. |
 
 ## Releases
 

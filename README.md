@@ -147,6 +147,8 @@ on:
     workflows: ['Deploy']
     types: [completed]
 
+permissions: {}
+
 jobs:
   deploy-preview:
     if: github.repository_owner == 'withastro'

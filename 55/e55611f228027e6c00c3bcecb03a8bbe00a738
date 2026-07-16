@@ -1,0 +1,19 @@
+.github/workflows/cloudflare-deploy.yml
+  s_9e8efffbbd22ad::t_131d22d5fa415a 1-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "55e55611f228027e6c00c3bcecb03a8bbe00a738",
+  "prompts": {},
+  "sessions": {
+    "s_9e8efffbbd22ad": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_094ec91e7ffeEz2RnlDQ9X6P6Q",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Matthew Phillips <matthewphillips@cloudflare.com>"
+    }
+  }
+}

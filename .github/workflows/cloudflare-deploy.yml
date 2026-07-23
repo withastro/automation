@@ -61,11 +61,6 @@ on:
         required: false
         type: string
         default: ""
-      wrangler-version:
-        description: 'Pin the wrangler version used by wrangler-action. Uses the action default when empty.'
-        required: false
-        type: string
-        default: ""
     secrets:
       CLOUDFLARE_API_TOKEN:
         description: 'Cloudflare API token with permission to deploy the Worker.'
@@ -116,7 +111,6 @@ jobs:
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          wranglerVersion: ${{ inputs.wrangler-version }}
           # Install wrangler with npm (always present on the runner). Otherwise
           # wrangler-action infers the package manager from the repo's lockfile
           # and fails when e.g. pnpm isn't set up (repos with no build step).

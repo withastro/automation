@@ -23,11 +23,6 @@ on:
           created on this Worker so they resolve on its preview domain.
         required: true
         type: string
-      wrangler-version:
-        description: 'Pin the wrangler version used by wrangler-action. Uses the action default when empty.'
-        required: false
-        type: string
-        default: ""
     secrets:
       CLOUDFLARE_API_TOKEN:
         description: 'Cloudflare API token with permission to publish preview versions of the Worker.'
@@ -113,7 +108,6 @@ jobs:
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          wranglerVersion: ${{ inputs.wrangler-version }}
           # Install wrangler with npm (always present on the runner). Otherwise
           # wrangler-action infers the package manager from a lockfile in the
           # downloaded artifact and fails when e.g. pnpm isn't set up.

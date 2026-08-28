@@ -92,7 +92,8 @@ jobs:
     with:
       # Set command to this repository’s package script that runs Prettier
       command: 'format:ci'
-    secrets: inherit
+    secrets:
+      FREDKBOT_GITHUB_TOKEN: ${{ secrets.FREDKBOT_GITHUB_TOKEN }}
 ```
 
 ## [`cloudflare-deploy.yml`](./.github/workflows/cloudflare-deploy.yml)

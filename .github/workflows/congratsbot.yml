@@ -70,6 +70,7 @@ jobs:
       - name: Send message on Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_MENTIONS: '{ "parse": [] }'
         uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554 # 0.4.0
         with:
           args: '${{ steps.message.outputs.DISCORD_MESSAGE }}'

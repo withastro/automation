@@ -72,7 +72,7 @@ When writing congrats messages, remember that `<names>` could be one, two, or mo
 
 ## [`format.yml`](./.github/workflows/format.yml)
 
-This workflow runs a repository’s code formatting tooling (e.g. Prettier) and commits any resulting changes directly.
+This workflow runs a repository’s code formatting tooling (e.g. Prettier). It needs the `FREDKBOT_GITHUB_TOKEN` to be passed as a secrets parameter to be able to commits any resulting changes directly.
 
 ### Usage
 

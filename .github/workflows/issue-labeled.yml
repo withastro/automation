@@ -31,6 +31,8 @@ jobs:
       - name: needs repro
         if: github.event.label.name == 'needs repro'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          BODY: ${{ inputs.repro_message_content }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -38,7 +40,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: ${{ inputs.repro_message_content }}
+              body: process.env.BODY,
             });
             await github.rest.issues.removeLabel({
               issue_number: context.issue.number,
